@@ -6,14 +6,16 @@
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
 import java.security.Key;
+import javax.crypto.SealedObject;
 
 /**
  *
  * @author Mattia
  */
 public interface KeysManager {
-    public void updateKEKs(Key[] newKEKs);
-    public void updateDEK(Key DEK);
+    public void updateOnJoin(SealedObject[] newKeks, SealedObject newDek);
+    public void updateOnLeave(SealedObject[] newKeks, SealedObject[] newDek);
+    public void initialise(SealedObject[] newKeks, SealedObject newDek);
     public void confirmUpdate();
     public Key getPrivateKey();
     public Key getPublicKey();

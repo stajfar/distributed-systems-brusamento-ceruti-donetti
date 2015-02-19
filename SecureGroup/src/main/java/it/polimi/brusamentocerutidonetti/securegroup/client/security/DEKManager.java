@@ -5,12 +5,12 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
-import java.security.Key;
+import javax.crypto.Cipher;
 
 /**
  *
  * @author Mattia
  */
 public interface DEKManager {
-    public Key getDEK();
+    public Cipher getDEK();
 }
