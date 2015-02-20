@@ -5,12 +5,45 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  *
  * @author Mattia
  */
-public class GroupSender {
+public class GroupSender implements MessageSender{
+    
+    public static final String groupIP = "224.0.0.1";
+    public static final int portMulticast = 6789;
+    
+    private MulticastSocket ms;
+    private InetAddress group;
+    
+    public GroupSender(MulticastSocket ms, InetAddress group){
+        this.ms = ms;
+        this.group = group;
+    }
+    
+    @Override
+    public void sendMessage(Serializable o, Class msgClass) {
+        if(msgClass.equals(String.class)){
+            try {
+                String msg = (String) o;
+                DatagramPacket pckt = new DatagramPacket(msg.getBytes(), msg.length(),
+                        group, 6789);
+                ms.send(pckt);
+            } catch (IOException ex) {
+                Logger.getLogger(GroupSender.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     
 }

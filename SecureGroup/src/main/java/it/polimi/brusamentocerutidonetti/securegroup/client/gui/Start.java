@@ -12,11 +12,7 @@ package it.polimi.brusamentocerutidonetti.securegroup.client.gui;
 public class Start {
     
     
-    public static final String inetAddress = "225.0.0.0";
-    public static final int portMulticast = 6789;
-    
-    public static final String serverAddress = "localhost";
-            
+               
     /**
      * @param args the command line arguments
      */

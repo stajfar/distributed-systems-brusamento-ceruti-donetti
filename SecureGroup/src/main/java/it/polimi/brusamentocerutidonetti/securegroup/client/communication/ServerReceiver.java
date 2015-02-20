@@ -5,15 +5,38 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Mattia
  */
 public class ServerReceiver implements Runnable{
-
+    
+    private Socket s;
+    private ObjectInputStream ois;
+    private MessageHandler mh;
+    
+    public ServerReceiver(Socket s) throws IOException{
+        this.s = s;
+        ois = new ObjectInputStream(s.getInputStream());        
+    }
+    
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        while(true){
+            try {
+                mh.handleMessage(ois.readObject());
+            } catch (IOException ex) {
+                Logger.getLogger(ServerReceiver.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ServerReceiver.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
 }

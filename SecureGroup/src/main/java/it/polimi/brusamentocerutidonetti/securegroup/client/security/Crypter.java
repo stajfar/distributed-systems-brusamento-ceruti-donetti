@@ -5,16 +5,20 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
+import it.polimi.brusamentocerutidonetti.securegroup.client.communication.MessageHandler;
 import it.polimi.brusamentocerutidonetti.securegroup.client.communication.MessageSender;
+import it.polimi.brusamentocerutidonetti.securegroup.client.gui.UserInterface;
 import java.io.Serializable;
+import javax.crypto.SealedObject;
 
 /**
  *
  * @author Mattia
  */
-public class Crypter implements MessageSender{
+public class Crypter implements MessageSender, MessageHandler{
     
     private DEKManager dekm;
+    private UserInterface ui;
     
     @Override
     public void sendMessage(Serializable msg, Class msgClass) {
@@ -23,6 +27,11 @@ public class Crypter implements MessageSender{
             
         }
         
+    }
+
+    @Override
+    public synchronized void handleMessage(Object o) {
+       
     }
     
     

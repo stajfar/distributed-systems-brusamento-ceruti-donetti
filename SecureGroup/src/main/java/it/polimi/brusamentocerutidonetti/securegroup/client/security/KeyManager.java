@@ -26,8 +26,8 @@ public class KeyManager implements DEKManager, KeysManager{
     
     public static final String SYMM_ALGORITHM = "AES";
     public static final String ASYMM_ALGORITHM = "RSA";
-    private Key[] keks;
-    private Key dek;
+    private Key[] keks, tmpKeks;
+    private Key dek, tmpDek;
     private Key privateKey, publicKey;
     private UserInterface logger;
 
@@ -75,7 +75,7 @@ public class KeyManager implements DEKManager, KeysManager{
             for (int i = 0; i < newKeks.length; i++) {
                 cipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
                 try {
-                        this.keks[i] = (Key) newKeks[i].getObject(cipher);
+                        this.tmpKeks[i] = (Key) newKeks[i].getObject(cipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                                 | BadPaddingException | IOException e) {
                         logger.receiveMessage(getClass() + ": KEK " + i + " NOT updated");
@@ -84,7 +84,7 @@ public class KeyManager implements DEKManager, KeysManager{
 
             cipher.init(Cipher.DECRYPT_MODE, this.dek);
             try {
-                this.dek = (Key) newDek.getObject(cipher);
+                this.tmpDek = (Key) newDek.getObject(cipher);
             } catch (ClassNotFoundException | IllegalBlockSizeException
                             | BadPaddingException | IOException e) {
                 logger.receiveMessage(getClass() + ": DEK NOT updated");
@@ -93,6 +93,9 @@ public class KeyManager implements DEKManager, KeysManager{
                     | InvalidKeyException e) {
             logger.receiveMessage(getClass() + ": updateOnJoin error.");
         }
+        
+        ackUpdate();
+        
     }
 
     @Override
@@ -108,7 +111,7 @@ public class KeyManager implements DEKManager, KeysManager{
                 kekCipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
                 try {
                     SealedObject firstStep = (SealedObject) newKeks[i].getObject(dekCipher);
-                    this.keks[i] = (Key)firstStep.getObject(kekCipher);
+                    this.tmpKeks[i] = (Key)firstStep.getObject(kekCipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                             | BadPaddingException | IOException e) {
                     logger.receiveMessage(getClass() + ": KEK " + i + " NOT updated");
@@ -129,6 +132,8 @@ public class KeyManager implements DEKManager, KeysManager{
                         | InvalidKeyException e) {
                 logger.receiveMessage(getClass() + ": updateOnLeav error.");
         }
+        
+        ackUpdate();
 		
     }
 
@@ -136,6 +141,7 @@ public class KeyManager implements DEKManager, KeysManager{
     public synchronized void initialise(SealedObject[] newKeks, SealedObject newDek) {
         try {
             this.keks = new Key[3];
+            this.tmpKeks = new Key[3];
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             for (int i = 0; i < keks.length; i++) {
@@ -149,6 +155,13 @@ public class KeyManager implements DEKManager, KeysManager{
                         | IllegalBlockSizeException | BadPaddingException | IOException e) {
             logger.receiveMessage("Error in receiving the keys.");
         }
+        
+        ackUpdate();
+    }
+    
+    
+    private void ackUpdate(){
+        
     }
     
 }
