@@ -7,7 +7,6 @@ package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.logging.Level;

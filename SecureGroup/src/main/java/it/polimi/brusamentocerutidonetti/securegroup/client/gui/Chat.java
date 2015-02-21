@@ -14,7 +14,7 @@ import javax.swing.JPanel;
  *
  * @author Mattia
  */
-public class Chat extends JPanel implements UserInterface{
+public class Chat extends JPanel implements UserInterface, Logger{
     
     private String username;
     private SendButton sendButton;
@@ -27,21 +27,9 @@ public class Chat extends JPanel implements UserInterface{
         this.print(msg);
     }
 
-    @Override
-    public void lockInterface() {
-        sendButton.setEnabled(false);
-        joinButton.setEnabled(false);
-    }
-
-    @Override
-    public void unlockInterface() {
-        sendButton.setEnabled(true);
-        joinButton.setEnabled(true);
-    }
-
     
     private synchronized void print(String msg) {
-        screenArea.append(msg);
+        screenArea.append(msg + "\n");
     }
 
     @Override
@@ -53,6 +41,51 @@ public class Chat extends JPanel implements UserInterface{
            this.print(msg);
            sender.sendMessage(msg, String.class);
         }
+    }
+
+    @Override
+    public void error(String e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public synchronized void log(String l) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public synchronized void joinAccepeted() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void requestJoin() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void leaveAccepetd() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void lockJoin() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void unlockJoin() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void lockSend() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void unlockSend() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 

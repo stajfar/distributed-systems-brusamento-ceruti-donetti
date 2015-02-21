@@ -31,9 +31,7 @@ public class ServerReceiver implements Runnable{
         while(true){
             try {
                 mh.handleMessage(ois.readObject());
-            } catch (IOException ex) {
-                Logger.getLogger(ServerReceiver.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ServerReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

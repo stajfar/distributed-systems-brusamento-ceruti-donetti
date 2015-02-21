@@ -37,13 +37,10 @@ public class GroupReceiver implements Runnable{
                 ms.receive(recv);
                 ByteArrayInputStream bs = new ByteArrayInputStream(buffer);
                 ObjectInputStream os = new ObjectInputStream(new BufferedInputStream(bs));
-                Object msg = null;
+                Object msg = new Object();
                 try {
                     msg = os.readObject();
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (IOException ex) {
+                } catch (ClassNotFoundException | IOException ex){
                     Logger.getLogger(GroupReceiver.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 

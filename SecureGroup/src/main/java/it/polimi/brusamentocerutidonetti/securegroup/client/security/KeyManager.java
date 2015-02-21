@@ -5,13 +5,15 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
-import it.polimi.brusamentocerutidonetti.securegroup.client.gui.UserInterface;
+import it.polimi.brusamentocerutidonetti.securegroup.client.gui.Logger;
+import it.polimi.brusamentocerutidonetti.securegroup.common.Parameters;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -26,33 +28,41 @@ public class KeyManager implements DEKManager, KeysManager{
     
     public static final String SYMM_ALGORITHM = "AES";
     public static final String ASYMM_ALGORITHM = "RSA";
-    private Key[] keks, tmpKeks;
-    private Key dek, tmpDek;
+    private Key[] keks;
+    private Key dek;
     private Key privateKey, publicKey;
-    private UserInterface logger;
+    private Logger logger;
+    
+    private Cipher decrypter, secondaryDecrypter;
+    private Cipher encrypter;
 
-    public KeyManager(UserInterface logger) {
+    public KeyManager(Logger logger) {
         this.logger = logger;
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance(ASYMM_ALGORITHM);
             kpg.initialize(2048);
             KeyPair kp = kpg.generateKeyPair();
             privateKey = kp.getPrivate();
             publicKey = kp.getPublic();
         } catch (NoSuchAlgorithmException e) {
-            logger.receiveMessage(getClass() + ": Constructor error.");
+            logger.error(getClass() + ": Constructor error.");
         }
     }
     
-    @Override
-    public Cipher getDEK() {
-        return null;
-    }
 
 
     @Override
-    public void confirmUpdate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public synchronized void confirmUpdate() {
+        try {
+            secondaryDecrypter = decrypter;
+            decrypter = Cipher.getInstance(SYMM_ALGORITHM);
+            decrypter.init(Cipher.DECRYPT_MODE, dek);
+            encrypter = Cipher.getInstance(SYMM_ALGORITHM);
+            encrypter.init(Cipher.ENCRYPT_MODE, dek);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException ex) {
+            logger.error(getClass() + ": Error in changing the keys.");
+        }
+        
     }
 
     @Override
@@ -75,23 +85,23 @@ public class KeyManager implements DEKManager, KeysManager{
             for (int i = 0; i < newKeks.length; i++) {
                 cipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
                 try {
-                        this.tmpKeks[i] = (Key) newKeks[i].getObject(cipher);
+                        this.keks[i] = (Key) newKeks[i].getObject(cipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                                 | BadPaddingException | IOException e) {
-                        logger.receiveMessage(getClass() + ": KEK " + i + " NOT updated");
+                        logger.error(getClass() + ": KEK " + i + " NOT updated");
                 }
             }
 
             cipher.init(Cipher.DECRYPT_MODE, this.dek);
             try {
-                this.tmpDek = (Key) newDek.getObject(cipher);
+                this.dek = (Key) newDek.getObject(cipher);
             } catch (ClassNotFoundException | IllegalBlockSizeException
                             | BadPaddingException | IOException e) {
-                logger.receiveMessage(getClass() + ": DEK NOT updated");
+                logger.error(getClass() + ": DEK NOT updated");
             }
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                     | InvalidKeyException e) {
-            logger.receiveMessage(getClass() + ": updateOnJoin error.");
+            logger.error(getClass() + ": updateOnJoin error.");
         }
         
         ackUpdate();
@@ -111,10 +121,10 @@ public class KeyManager implements DEKManager, KeysManager{
                 kekCipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
                 try {
                     SealedObject firstStep = (SealedObject) newKeks[i].getObject(dekCipher);
-                    this.tmpKeks[i] = (Key)firstStep.getObject(kekCipher);
+                    this.keks[i] = (Key)firstStep.getObject(kekCipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                             | BadPaddingException | IOException e) {
-                    logger.receiveMessage(getClass() + ": KEK " + i + " NOT updated");
+                    logger.error(getClass() + ": KEK " + i + " NOT updated");
                 }
             }
 
@@ -130,7 +140,7 @@ public class KeyManager implements DEKManager, KeysManager{
             }
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                         | InvalidKeyException e) {
-                logger.receiveMessage(getClass() + ": updateOnLeav error.");
+                logger.error(getClass() + ": updateOnLeav error.");
         }
         
         ackUpdate();
@@ -140,28 +150,47 @@ public class KeyManager implements DEKManager, KeysManager{
     @Override
     public synchronized void initialise(SealedObject[] newKeks, SealedObject newDek) {
         try {
-            this.keks = new Key[3];
-            this.tmpKeks = new Key[3];
-            Cipher cipher = Cipher.getInstance("RSA");
+            this.keks = new Key[Parameters.FLAT_TABLE];
+            this.keks = new Key[Parameters.FLAT_TABLE];
+            Cipher cipher = Cipher.getInstance(ASYMM_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             for (int i = 0; i < keks.length; i++) {
                 this.keks[i] = (Key) newKeks[i].getObject(cipher);
             }
 
             this.dek = (Key) newDek.getObject(cipher);
-            logger.receiveMessage("Keys received.");
+            decrypter = Cipher.getInstance(SYMM_ALGORITHM);
+            decrypter.init(Cipher.DECRYPT_MODE, dek);
+            secondaryDecrypter = decrypter;
+            encrypter = Cipher.getInstance(SYMM_ALGORITHM);
+            encrypter.init(Cipher.ENCRYPT_MODE, dek);
+            logger.log(getClass() + ": Keys received.");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                         | InvalidKeyException | ClassNotFoundException
                         | IllegalBlockSizeException | BadPaddingException | IOException e) {
-            logger.receiveMessage("Error in receiving the keys.");
+            logger.error(getClass() + ": Error in receiving the keys.");
         }
-        
-        ackUpdate();
     }
     
     
     private void ackUpdate(){
         
     }
+
+    @Override
+    public synchronized Cipher getEncrypter() {
+       return encrypter;
+    }
+
+    @Override
+    public synchronized Cipher getDecrypter() {
+        return decrypter;
+    }
+
+    @Override
+    public synchronized Cipher getSecondaryDecrypter() {
+        return secondaryDecrypter;
+    }
+
     
 }

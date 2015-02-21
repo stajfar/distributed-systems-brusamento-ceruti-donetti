@@ -12,5 +12,7 @@ import javax.crypto.Cipher;
  * @author Mattia
  */
 public interface DEKManager {
-    public Cipher getDEK();
+    public Cipher getEncrypter();
+    public Cipher getDecrypter();
+    public Cipher getSecondaryDecrypter();
 }
