@@ -13,7 +13,6 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -26,8 +25,8 @@ import javax.crypto.SealedObject;
  */
 public class KeyManager implements DEKManager, KeysManager{
     
-    public static final String SYMM_ALGORITHM = "AES";
-    public static final String ASYMM_ALGORITHM = "RSA";
+    private static final String SYMM_ALGORITHM = Parameters.SYMM_ALGORITHM;
+    private static final String ASYMM_ALGORITHM = Parameters.ASYMM_ALGORITHM;
     private Key[] keks;
     private Key dek;
     private Key privateKey, publicKey;

@@ -5,33 +5,39 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.server;
 
+import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
+
 /**
  *
  * @author Mattia
  */
 public class Request {
     
-    private int type;
-    private int UUID;
+    private Connection connection;
+    private Message message;
 
+    public Request(Connection connection, Message message) {
+        this.connection = connection;
+        this.message = message;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
     
     
-    
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getUUID() {
-        return UUID;
-    }
-
-    public void setUUID(int UUID) {
-        this.UUID = UUID;
-    }
     
     
     

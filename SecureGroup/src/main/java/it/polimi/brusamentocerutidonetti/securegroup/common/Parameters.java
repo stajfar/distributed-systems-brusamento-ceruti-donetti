@@ -13,6 +13,9 @@ public class Parameters {
     public static final int MAX_MEMBERS = 8;
     public static final int FLAT_TABLE = (int) Math.ceil(Math.log(MAX_MEMBERS)/Math.log(2));
     
+    public static final String SYMM_ALGORITHM = "AES";
+    public static final String ASYMM_ALGORITHM = "RSA";
+    
     /**
      * Codes for the protocol
     */
