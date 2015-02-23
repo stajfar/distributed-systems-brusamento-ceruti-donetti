@@ -44,7 +44,7 @@ public class RequestManager implements Runnable, RequestHandler{
     private void handleRequest(Request req){
         int code = req.getMessage().getCode();
         switch(code){
-            case (Parameters.REQUEST_JOIN): handleJoin(req); break;
+            case (Parameters.REQUEST_JOIN):  handleJoin(req); break;
             case (Parameters.REQUEST_LEAVE): handleLeave(req); break;
         }
     }
@@ -117,6 +117,7 @@ public class RequestManager implements Runnable, RequestHandler{
         Connection c = req.getConnection();
         int leaveID = c.getID();
         members.remove(c);
+        c.close();
         
         ft.updateKeys(leaveID);
         SealedObject[] deks = ft.getDEKsAfterLeave(leaveID);

@@ -5,12 +5,17 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
+import it.polimi.brusamentocerutidonetti.securegroup.client.communication.GroupReceiver;
+import it.polimi.brusamentocerutidonetti.securegroup.client.communication.GroupSender;
 import it.polimi.brusamentocerutidonetti.securegroup.client.communication.MessageHandler;
 import it.polimi.brusamentocerutidonetti.securegroup.client.communication.MessageSender;
 import it.polimi.brusamentocerutidonetti.securegroup.client.gui.Logger;
 import it.polimi.brusamentocerutidonetti.securegroup.client.gui.UserInterface;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -23,10 +28,31 @@ import javax.crypto.SealedObject;
  */
 public class Crypter implements MessageSender, MessageHandler{
     
+    public static final String groupIP = "225.0.0.1";
+    public static final int portMulticast = 6789;
+    
     private DEKManager dekm;
     private UserInterface ui;
     private Logger logger;
     private MessageSender ms;
+    
+    public Crypter(UserInterface ui, Logger log, DEKManager dek){
+        try {
+            this.ui = ui;
+            this.logger = log;
+            this.dekm = dek;
+            InetAddress group = InetAddress.getByName(groupIP);
+            MulticastSocket s = new MulticastSocket(portMulticast);
+            s.joinGroup(group);
+            this.ms = new GroupSender(s, group);
+            new Thread(new GroupReceiver(s, this)).start();
+        } catch (UnknownHostException ex) {
+            logger.error(getClass() + ": Unkown host exception.");
+        } catch (IOException ex) {
+            logger.error(getClass() + ": IOexception.");
+        }
+        
+    }
     
     @Override
     public void sendMessage(Serializable msg, Class msgClass) {

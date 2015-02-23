@@ -16,13 +16,14 @@ public class SyncQueue<T> extends LinkedBlockingQueue<Object>{
     
     @Override
     public synchronized Object poll(){
-        while(super.poll() == null){
+        Object element = super.poll();
+        while(element == null){
             try {
                 wait();
+                element = super.poll();
             } catch (Exception e) {
             }
         }
-        Object element = super.poll();
         notifyAll();
         return element;
     }

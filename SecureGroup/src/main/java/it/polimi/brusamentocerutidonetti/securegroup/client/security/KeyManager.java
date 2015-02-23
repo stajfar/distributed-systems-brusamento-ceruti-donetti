@@ -33,7 +33,6 @@ public class KeyManager implements DEKManager, KeysManager{
     private Key dek;
     private Key privateKey, publicKey;
     private Logger logger;
-    private MessageSender ms;
     
     private Cipher decrypter, secondaryDecrypter;
     private Cipher encrypter;
@@ -105,9 +104,6 @@ public class KeyManager implements DEKManager, KeysManager{
                     | InvalidKeyException e) {
             logger.error(getClass() + ": updateOnJoin error.");
         }
-        
-        ackUpdate();
-        
     }
 
     @Override
@@ -145,8 +141,6 @@ public class KeyManager implements DEKManager, KeysManager{
                 logger.error(getClass() + ": updateOnLeav error.");
         }
         
-        ackUpdate();
-		
     }
 
     @Override
@@ -174,10 +168,6 @@ public class KeyManager implements DEKManager, KeysManager{
         }
     }
     
-    
-    private void ackUpdate(){
-        ms.sendMessage(new Message(Parameters.ACK_UPDATE), Message.class);
-    }
 
     @Override
     public synchronized Cipher getEncrypter() {
@@ -194,5 +184,6 @@ public class KeyManager implements DEKManager, KeysManager{
         return secondaryDecrypter;
     }
 
+    
     
 }

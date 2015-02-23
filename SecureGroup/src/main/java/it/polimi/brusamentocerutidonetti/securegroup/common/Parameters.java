@@ -18,6 +18,7 @@ public class Parameters {
     
     public static final int serverPort = 12345;
     
+    
     /**
      * Codes for the protocol
     */

@@ -5,8 +5,6 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Mattia

@@ -15,10 +15,21 @@ import javax.swing.JButton;
  * @author Mattia
  */
 public class JoinButton extends JButton implements ActionListener{
+    
+    private UserInterface ui;
+
+    public JoinButton(String join, UserInterface ui) {
+        super(join);
+        this.ui = ui;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        UserInterface container = (UserInterface) this.getParent();
+        if(this.getText().equals("Join")){
+            ui.requestJoin();
+        }else{
+            ui.requestLeave();
+        }
     }
     
 }

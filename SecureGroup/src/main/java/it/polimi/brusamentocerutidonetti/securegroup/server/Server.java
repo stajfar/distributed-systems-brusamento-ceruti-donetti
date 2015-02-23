@@ -39,6 +39,7 @@ public class Server {
             System.err.println(e.getMessage()); // porta non disponibile
             return;
         }
+        executor.submit(requestManager);
         System.out.println("Server ready on port: " + port);
         while (true) {
             try {

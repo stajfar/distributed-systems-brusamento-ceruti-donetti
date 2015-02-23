@@ -56,8 +56,8 @@ public class FlatTable {
      * @param memberID
      */
     public synchronized void updateKeys(int memberID){
-        oldOnes = ones;
-        oldZeros = zeros;
+        oldOnes = ones.clone();
+        oldZeros = zeros.clone();
         oldDek = dek;
         int[] bits = getBits(memberID);
         for (int i = 0; i < bits.length; i++) {

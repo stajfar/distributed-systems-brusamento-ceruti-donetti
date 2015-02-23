@@ -5,13 +5,9 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -25,9 +21,6 @@ import java.util.logging.Logger;
  * @author Mattia
  */
 public class GroupSender implements MessageSender{
-    
-    public static final String groupIP = "224.0.0.1";
-    public static final int portMulticast = 6789;
     
     private MulticastSocket ms;
     private InetAddress group;

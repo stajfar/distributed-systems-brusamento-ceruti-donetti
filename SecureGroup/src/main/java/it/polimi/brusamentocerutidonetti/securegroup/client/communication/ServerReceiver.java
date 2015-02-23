@@ -5,6 +5,7 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.communication;
 
+import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -21,8 +22,9 @@ public class ServerReceiver implements Runnable{
     private ObjectInputStream ois;
     private MessageHandler mh;
     
-    public ServerReceiver(Socket s) throws IOException{
+    public ServerReceiver(Socket s, MessageHandler mh) throws IOException{
         this.s = s;
+        this.mh = mh;
         ois = new ObjectInputStream(s.getInputStream());        
     }
     
@@ -30,7 +32,8 @@ public class ServerReceiver implements Runnable{
     public void run() {
         while(true){
             try {
-                mh.handleMessage(ois.readObject());
+                Message m = (Message) ois.readObject();
+                mh.handleMessage(m);
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ServerReceiver.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -11,6 +11,7 @@ import it.polimi.brusamentocerutidonetti.securegroup.client.security.KeysManager
 import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
 import it.polimi.brusamentocerutidonetti.securegroup.common.Parameters;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.Socket;
 import java.security.Key;
 import javax.crypto.SealedObject;
@@ -29,17 +30,30 @@ public class ServerDispatcher implements MessageHandler{
     private Logger logger;
     private UserInterface ui;
     
+    public ServerDispatcher(UserInterface ui, Logger log, KeysManager km){
+        this.ui = ui;
+        this.logger = log;
+        this.km = km;
+    }
+    
     public void requestJoin(){
+        logger.log("WAITING FOR JOINING...");
         try {
             Socket s = new Socket(serverIP, port);
             ms = new ServerSender(s);
-            new Thread(new ServerReceiver(s)).start();
+            new Thread(new ServerReceiver(s, this)).start();
             Key publicKey = km.getPublicKey();
             Message msg = new Message(Parameters.REQUEST_JOIN, publicKey);
             ms.sendMessage(msg, Message.class);
         } catch (IOException ex) {
-            logger.error(getClass() + ": Server not found.");
+            logger.error(getClass().toString() + ": Server not found.");
+            ui.refusedJoin();
         }
+    }
+    
+    public void requestLeave(){
+        Message msg = new Message(Parameters.REQUEST_LEAVE);
+        ms.sendMessage(msg, Message.class);
     }
     
     /**
@@ -70,7 +84,7 @@ public class ServerDispatcher implements MessageHandler{
     
     private void refusedJoin(){
         logger.error(getClass() + ": You join request has been refused. Try again later.");
-        ui.unlockJoin();
+        ui.refusedJoin();
     }
     
     /**
@@ -81,7 +95,7 @@ public class ServerDispatcher implements MessageHandler{
         int lenght = msg.getLenght();
         if(lenght < (Parameters.FLAT_TABLE + 1)){
             logger.error(getClass() + ": Error receiving keys.");
-            ui.unlockJoin();
+            ui.joinAccepeted();
             return;
         }
         Object[] body = msg.getBody();
@@ -92,7 +106,7 @@ public class ServerDispatcher implements MessageHandler{
         }
         SealedObject dek = (SealedObject) body[i];
         km.initialise(keks, dek);
-        logger.log(getClass() + ": You joined the group!");
+        logger.log("YOU HAVE JOINED THE GROUP!");
         ui.joinAccepeted();
     }
     
@@ -101,8 +115,7 @@ public class ServerDispatcher implements MessageHandler{
      * @param msg the message with the new keys.
      */
     private void someoneJoining(Message msg) {
-        ui.lockSend();
-        ui.lockJoin();
+        ui.lockForUpdate();
         logger.log(getClass() + ": Someone is joining the group!");
         int lenght = msg.getLenght();
         if(lenght < (Parameters.FLAT_TABLE + 1)){
@@ -126,8 +139,7 @@ public class ServerDispatcher implements MessageHandler{
      * @param msg the message with the new keys.
      */
     private void someoneLeaving(Message msg) {
-        ui.lockSend();
-        ui.lockJoin();
+        ui.lockForUpdate();
         logger.log(getClass() + ": Someone is leaving the group!");
         int lenght = msg.getLenght();
         if(lenght < (2*Parameters.FLAT_TABLE)){
@@ -154,14 +166,14 @@ public class ServerDispatcher implements MessageHandler{
      */
     private void updateComplete() {
         km.confirmUpdate();
-        ui.unlockSend();
-        ui.unlockJoin();
+        ui.updateComplete();
     }
 
     private void leaveComplete() {
+        logger.log("YOU HAVE LEFT THE GROUP!");
         ui.leaveAccepetd();
     }
-    
+
     
     
 }

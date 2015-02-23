@@ -20,26 +20,24 @@ import java.util.logging.Logger;
 public class ServerSender implements MessageSender{
     
     Socket serverSocket;
+    ObjectOutputStream oos;
 
-    ServerSender(Socket s) {
-        this.serverSocket = s;
+    public ServerSender(Socket s) {
+        try {
+            this.serverSocket = s;
+            oos = new ObjectOutputStream(serverSocket.getOutputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(ServerSender.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @Override
     public void sendMessage(Serializable msg, Class msgClass) {
-        ObjectOutputStream oos = null;
         try {
-            oos = new ObjectOutputStream(serverSocket.getOutputStream());
             oos.writeObject(msg);
             oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(ServerSender.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                oos.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ServerSender.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
     

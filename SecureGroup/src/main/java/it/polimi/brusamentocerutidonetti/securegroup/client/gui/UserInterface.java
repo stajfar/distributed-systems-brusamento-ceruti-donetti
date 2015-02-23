@@ -11,12 +11,16 @@ package it.polimi.brusamentocerutidonetti.securegroup.client.gui;
  */
 public interface UserInterface {
     public void receiveMessage(String msg);
+    
     public void joinAccepeted();
     public void requestJoin();
+    public void refusedJoin();
+    
+    public void requestLeave();
     public void leaveAccepetd();
-    public void lockJoin();
-    public void unlockJoin();
-    public void lockSend();
-    public void unlockSend();
+    
+    public void lockForUpdate();
+    public void updateComplete();
+    
     public void send();
 }

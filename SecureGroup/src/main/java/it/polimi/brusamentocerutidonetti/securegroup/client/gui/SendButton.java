@@ -14,11 +14,18 @@ import javax.swing.JButton;
  * @author Mattia
  */
 public class SendButton extends JButton implements ActionListener{
-
+    
+    
+    private UserInterface ui;
+    
+    public SendButton(String name, UserInterface ui){
+        super(name);
+        this.ui = ui;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
-        UserInterface userI = (UserInterface) getParent();
-        userI.send();
+        ui.send();
     }
     
 }
