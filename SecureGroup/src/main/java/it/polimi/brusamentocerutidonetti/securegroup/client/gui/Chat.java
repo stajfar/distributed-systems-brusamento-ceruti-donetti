@@ -22,6 +22,8 @@ public class Chat extends JPanel implements UserInterface, Logger{
     private TextArea screenArea, writingArea;
     private MessageSender sender;
     
+    
+    
     @Override
     public void receiveMessage(String msg) {
         this.print(msg);

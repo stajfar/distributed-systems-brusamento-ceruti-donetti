@@ -5,7 +5,9 @@
  */
 package it.polimi.brusamentocerutidonetti.securegroup.client.security;
 
+import it.polimi.brusamentocerutidonetti.securegroup.client.communication.MessageSender;
 import it.polimi.brusamentocerutidonetti.securegroup.client.gui.Logger;
+import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
 import it.polimi.brusamentocerutidonetti.securegroup.common.Parameters;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -31,6 +33,7 @@ public class KeyManager implements DEKManager, KeysManager{
     private Key dek;
     private Key privateKey, publicKey;
     private Logger logger;
+    private MessageSender ms;
     
     private Cipher decrypter, secondaryDecrypter;
     private Cipher encrypter;
@@ -84,10 +87,10 @@ public class KeyManager implements DEKManager, KeysManager{
             for (int i = 0; i < newKeks.length; i++) {
                 cipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
                 try {
-                        this.keks[i] = (Key) newKeks[i].getObject(cipher);
+                    this.keks[i] = (Key) newKeks[i].getObject(cipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                                 | BadPaddingException | IOException e) {
-                        logger.error(getClass() + ": KEK " + i + " NOT updated");
+                    logger.error(getClass() + ": KEK " + i + " NOT updated");
                 }
             }
 
@@ -114,6 +117,16 @@ public class KeyManager implements DEKManager, KeysManager{
         }
         try {
             Cipher kekCipher = Cipher.getInstance(SYMM_ALGORITHM);
+            for (int i = 0; i < keks.length; i++) {
+                kekCipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
+                try {
+                    this.dek = (Key) newDeks[i].getObject(kekCipher);
+                    break;
+                } catch (ClassNotFoundException | IllegalBlockSizeException
+                                | BadPaddingException | IOException e) {
+                        //I was only trying with the wrong key...
+                }
+            }
             Cipher dekCipher = Cipher.getInstance(SYMM_ALGORITHM);
             dekCipher.init(Cipher.DECRYPT_MODE, this.dek);
             for (int i = 0; i < keks.length; i++) {
@@ -127,16 +140,6 @@ public class KeyManager implements DEKManager, KeysManager{
                 }
             }
 
-            for (int i = 0; i < keks.length; i++) {
-                kekCipher.init(Cipher.DECRYPT_MODE, this.keks[i]);
-                try {
-                    this.dek = (Key) newDeks[i].getObject(kekCipher);
-                    break;
-                } catch (ClassNotFoundException | IllegalBlockSizeException
-                                | BadPaddingException | IOException e) {
-                        //I was only trying with the wrong key...
-                }
-            }
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                         | InvalidKeyException e) {
                 logger.error(getClass() + ": updateOnLeav error.");
@@ -173,7 +176,7 @@ public class KeyManager implements DEKManager, KeysManager{
     
     
     private void ackUpdate(){
-        
+        ms.sendMessage(new Message(Parameters.ACK_UPDATE), Message.class);
     }
 
     @Override

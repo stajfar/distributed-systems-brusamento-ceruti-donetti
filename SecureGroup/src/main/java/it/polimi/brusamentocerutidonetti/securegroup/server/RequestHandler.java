@@ -10,5 +10,5 @@ package it.polimi.brusamentocerutidonetti.securegroup.server;
  * @author Mattia
  */
 public interface RequestHandler {
-    public void updateAcked(long ID);
+    public void updateAcked(int ID);
 }

@@ -6,11 +6,11 @@
 package it.polimi.brusamentocerutidonetti.securegroup.server;
 
 import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
+import it.polimi.brusamentocerutidonetti.securegroup.common.Parameters;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,8 +25,20 @@ public class SocketConnection implements Connection, Runnable{
     private Socket s;
     private ObjectInputStream i;
     private ObjectOutputStream o;
-    private Queue<Request> q;
+    private SyncQueue<Request> q;
+    private RequestHandler h;
     private boolean open;
+    
+    public SocketConnection(Socket s, SyncQueue<Request> q){
+        try {
+            this.q = q;
+            this.s = s;
+            i = new ObjectInputStream(s.getInputStream());
+            o = new ObjectOutputStream(s.getOutputStream());
+        } catch (IOException ex) {
+            Logger.getLogger(SocketConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     @Override
     public void send(Message m){
@@ -49,7 +61,11 @@ public class SocketConnection implements Connection, Runnable{
         while(isOpen()){
             try {
                 Message m = (Message) i.readObject();
-                q.offer(new Request(this, m));
+                if(m.getCode() == Parameters.ACK_UPDATE){
+                    h.updateAcked(ID);
+                }else{
+                    q.offer(new Request(this, m));
+                }
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(SocketConnection.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -16,20 +16,55 @@ public class Parameters {
     public static final String SYMM_ALGORITHM = "AES";
     public static final String ASYMM_ALGORITHM = "RSA";
     
+    public static final int serverPort = 12345;
+    
     /**
      * Codes for the protocol
     */
-    //JOIN REQUEST
+    
+    /**
+     * A client is requesting to join.
+     */
     public static final int REQUEST_JOIN = 1;
+    
+    /**
+     * The server refuses the join request.
+     */
     public static final int REFUSED_JOIN = 2;
+    
+    /**
+     * The server accepts the join and sends back the keys.
+     */
     public static final int ACCEPTED_JOIN = 3;
-    //SOMEONE JOINS/LEAVES
+    
+    /**
+     * The server advises that someone is joining and sends the new keys.
+     */
     public static final int SOMEONE_JOINING = 4;
+    
+    /**
+     * The server advises that someone is leaving and sends the new keys.
+     */
     public static final int SOMEONE_LEAVING = 5;
+    
+    /**
+     * The client acks the server.
+     */
     public static final int ACK_UPDATE = 6;
+    
+    /**
+     * The server acks the clients.
+     */
     public static final int UPDATE_COMPLETE = 7;    
-    //LEAVE REQUEST
+    
+    /**
+     * A client requests to leave.
+     */
     public static final int REQUEST_LEAVE = 8;
+    
+    /**
+     * The server confirms the leaving operation to the client.
+     */
     public static final int LEAVE_COMPLETE = 9;
     
 }
