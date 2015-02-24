@@ -87,7 +87,7 @@ public class KeyManager implements DEKManager, KeysManager{
                     this.keks[i] = (Key) newKeks[i].getObject(cipher);
                 } catch (ClassNotFoundException | IllegalBlockSizeException
                                 | BadPaddingException | IOException e) {
-                     logger.error(getClass() + ": KEK " + i + " NOT updated");
+                     //logger.error(getClass() + ": KEK " + i + " NOT updated");
                 }
             }
 

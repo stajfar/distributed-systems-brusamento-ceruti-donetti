@@ -83,16 +83,18 @@ public class Chat extends JFrame implements UserInterface, Logger{
         joinButton = new JoinButton("Join", this);
         joinButton.addActionListener(joinButton);
         
-        Border padding = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+        Border padding = BorderFactory.createRaisedSoftBevelBorder();
         textPane.setEditable(false);
         ((DefaultCaret) textPane.getCaret())
                         .setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         textPane.setBorder(BorderFactory.createCompoundBorder(null, padding));
+        textPane.setBackground(new Color(102, 255, 178));
         textPane.setPreferredSize(new Dimension(600, 400));
         loggerPane.setEditable(false);
         ((DefaultCaret) loggerPane.getCaret())
                         .setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         loggerPane.setBorder(BorderFactory.createCompoundBorder(null, padding));
+        loggerPane.setBackground(new Color(255, 178, 102));
 
         textField.addKeyListener((KeyListener) new Chat.SendListener());
 
@@ -105,17 +107,25 @@ public class Chat extends JFrame implements UserInterface, Logger{
                         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         this.add(panesPanel, BorderLayout.CENTER);
         inputPanel.setLayout(new BorderLayout());
-        inputPanel.setBorder(BorderFactory.createCompoundBorder(null, padding));
+        inputPanel.setBorder(BorderFactory.createCompoundBorder(padding, padding));
         inputPanel.add(joinButton, BorderLayout.WEST);
         inputPanel.add(textField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
+        inputPanel.setPreferredSize(new Dimension(800, 50));
+        inputPanel.setMinimumSize(inputPanel.getPreferredSize());
         this.add(inputPanel, BorderLayout.SOUTH);
         pack();
-        textPane.setSize(new Dimension(this.getWidth(), this.getHeight() / 2));
-        loggerPane.setSize(new Dimension(this.getWidth(), this.getHeight() / 2));
+        textPane.setSize(new Dimension(this.getWidth()/2 + 100, this.getHeight()));
+        loggerPane.setSize(new Dimension(this.getWidth()/2 - 100, this.getHeight()));
         textField.requestFocusInWindow();
         setLocationRelativeTo(null);
         setVisible(false);
+        print("***********************************************************************************");
+        print("WELCOME TO THE SECURE GROUP COMMUNICATION!");
+        print("Now you see the encrypted messages of the group.");
+        print("If you want to join, press the button below.");
+        print("If you want to exit, you first need to leave.");
+        print("************************************************************************************");
     }
 
     
