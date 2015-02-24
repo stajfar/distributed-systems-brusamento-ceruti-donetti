@@ -67,7 +67,7 @@ public class FlatTable {
                 zeros[i] = keygen.generateKey();
             }
         }
-        dek = refreshDEK();
+        refreshDEK();
     }
     
     /**

@@ -179,7 +179,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         sendButton.setEnabled(true);
         joinButton.setText("Leave");
         joinButton.setEnabled(true);
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            joinAccepeted();
+        }
     }
 
     @Override
@@ -187,7 +191,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         joinButton.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            requestJoin();
+        }
         serverDispatcher.requestJoin();
     }
     
@@ -197,7 +205,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         joinButton.setEnabled(true);
         setCursor(Cursor.getDefaultCursor());
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            refusedJoin();
+        }
     }
 
     @Override
@@ -207,7 +219,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         sendButton.setEnabled(false);
         joinButton.setText("Join");
         joinButton.setEnabled(true);
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            leaveAccepetd();
+        }
     }
 
     @Override
@@ -215,7 +231,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         joinButton.setEnabled(false);
         sendButton.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            lockForUpdate();
+        }
     }
 
     @Override
@@ -223,7 +243,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         joinButton.setEnabled(true);
         sendButton.setEnabled(true);
         setCursor(Cursor.getDefaultCursor());
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            updateComplete();
+        }
     }
 
     @Override
@@ -232,7 +256,11 @@ public class Chat extends JFrame implements UserInterface, Logger{
         joinButton.setEnabled(false);
         sendButton.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        validate();
+        try {
+            validate();
+        } catch (Exception e) {
+            requestLeave();
+        }
         serverDispatcher.requestLeave();
     }
 
@@ -254,8 +282,10 @@ public class Chat extends JFrame implements UserInterface, Logger{
         }
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == 10) {
-                send();
+            if(sendButton.isEnabled()){
+                if (e.getKeyCode() == 10) {
+                    send();
+                }
             }
         }
         @Override

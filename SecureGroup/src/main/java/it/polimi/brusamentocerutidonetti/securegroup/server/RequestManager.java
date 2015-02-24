@@ -17,10 +17,10 @@ import javax.crypto.SealedObject;
  *
  * @author Mattia
  */
-public class RequestManager implements Runnable, RequestHandler{
+public class RequestManager implements Runnable{
     
     private SyncQueue<Request> requests;
-    private List<Integer> ackList;
+    private SyncList<Integer> ackList;
     private List<Connection> members;
     private FlatTable ft;
 
@@ -28,7 +28,7 @@ public class RequestManager implements Runnable, RequestHandler{
         this.requests = requests;
         this.ft = ft;
         members = new ArrayList<>();
-        ackList = new ArrayList<>();
+        ackList = new SyncList<>();
     }
     
     
@@ -50,19 +50,6 @@ public class RequestManager implements Runnable, RequestHandler{
     }
     
     
-    /**
-     * Method offered by the interface in oder to let other connections to send their acks.
-     * @param ID 
-     */
-    @Override
-    public synchronized void updateAcked(int ID) {
-        if(!(ackList.contains(ID))){
-            ackList.add(ID);
-            notifyAll();
-        }
-    }
-    
-    
     
     /**
      * Manage the operations to do when a new member joins.
@@ -78,6 +65,7 @@ public class RequestManager implements Runnable, RequestHandler{
             /**
              * Send encrypted keys to the other members.
              */
+            c.setID(id);
             ft.updateKeys(id);
             for(Connection m: members){
                 SealedObject[] keys = ft.getEncryptedKeysJoin(m.getID());
@@ -87,12 +75,7 @@ public class RequestManager implements Runnable, RequestHandler{
             /**
              * Wait for all the acks.
              */
-            while (ackList.size() < members.size()) {                
-                try {
-                    wait();
-                } catch (Exception e) {
-                }
-            }
+             ackList.waitForCapacity(members.size());
             /**
              * Confirm the update to all the members and ack the new one.
              */
@@ -103,7 +86,7 @@ public class RequestManager implements Runnable, RequestHandler{
             SealedObject[] keys = ft.getKeysNewMember((Key) body[0], id);
             c.send(new Message(Parameters.ACCEPTED_JOIN, keys, keys.length));
             members.add(c);
-            ackList = new ArrayList<>();
+            ackList.free();
         }
     }
     
@@ -117,7 +100,6 @@ public class RequestManager implements Runnable, RequestHandler{
         Connection c = req.getConnection();
         int leaveID = c.getID();
         members.remove(c);
-        c.close();
         
         ft.updateKeys(leaveID);
         SealedObject[] deks = ft.getDEKsAfterLeave(leaveID);
@@ -129,21 +111,16 @@ public class RequestManager implements Runnable, RequestHandler{
          * Send the keys to each member.
          */
         for (Connection m : members) {
-            SealedObject[] keks = ft.getKEKsLeave(leaveID);
+            SealedObject[] keks = ft.getKEKsLeave(m.getID());
             for(int i=0; i<keks.length; i++){
                 keys[i] = keks[i];
             }
-            c.send(new Message(Parameters.SOMEONE_LEAVING, keys, keys.length));
+            m.send(new Message(Parameters.SOMEONE_LEAVING, keys, keys.length));
         }
         /**
          * Wait for the acks.
          */
-        while (ackList.size() < members.size()) {                
-            try {
-                wait();
-            } catch (Exception e) {
-            }
-        }
+        ackList.waitForCapacity(members.size());
         /**
          * Confirm the update
          */
@@ -151,7 +128,8 @@ public class RequestManager implements Runnable, RequestHandler{
             m.send(new Message(Parameters.UPDATE_COMPLETE));
         }
         c.send(new Message(Parameters.LEAVE_COMPLETE));
-        ackList = new ArrayList<>();
+        ackList.free();
+        c.close();
     }
     
     
@@ -170,6 +148,12 @@ public class RequestManager implements Runnable, RequestHandler{
         }
         return -1;
     }
+
+    public SyncList<Integer> getAckList() {
+        return ackList;
+    }
+    
+    
     
     
 }

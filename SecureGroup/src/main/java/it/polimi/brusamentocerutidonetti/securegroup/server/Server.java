@@ -46,7 +46,7 @@ public class Server {
                 System.out.println("Waiting for a new member.");
                 Socket socket = serverSocket.accept();
                 System.out.println("New client arrived.");
-                executor.submit(new SocketConnection(socket, this.requests));
+                executor.submit(new SocketConnection(socket, this.requests, requestManager.getAckList()));
             } catch(IOException e) {
                 break; // entrerei qui se serverSocket venisse chiuso
             }

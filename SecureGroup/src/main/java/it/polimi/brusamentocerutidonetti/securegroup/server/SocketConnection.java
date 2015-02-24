@@ -26,13 +26,14 @@ public class SocketConnection implements Connection, Runnable{
     private ObjectInputStream i;
     private ObjectOutputStream o;
     private SyncQueue<Request> q;
-    private RequestHandler h;
+    private SyncList<Integer> acks;
     private boolean open;
     
-    public SocketConnection(Socket s, SyncQueue<Request> q){
+    public SocketConnection(Socket s, SyncQueue<Request> q, SyncList<Integer> acks){
         try {
             this.q = q;
             this.s = s;
+            this.acks = acks;
             i = new ObjectInputStream(s.getInputStream());
             o = new ObjectOutputStream(s.getOutputStream());
         } catch (IOException ex) {
@@ -62,7 +63,7 @@ public class SocketConnection implements Connection, Runnable{
             try {
                 Message m = (Message) i.readObject();
                 if(m.getCode() == Parameters.ACK_UPDATE){
-                    h.updateAcked(ID);
+                    acks.add(ID);
                 }else{
                     q.offer(new Request(this, m));
                 }

@@ -37,7 +37,7 @@ public class ServerDispatcher implements MessageHandler{
     }
     
     public void requestJoin(){
-        logger.log("WAITING FOR JOINING...");
+        logger.log("Waiting to join...");
         try {
             Socket s = new Socket(serverIP, port);
             ms = new ServerSender(s);
@@ -52,6 +52,7 @@ public class ServerDispatcher implements MessageHandler{
     }
     
     public void requestLeave(){
+        logger.log("Waiting to leave...");
         Message msg = new Message(Parameters.REQUEST_LEAVE);
         ms.sendMessage(msg, Message.class);
     }
@@ -153,7 +154,7 @@ public class ServerDispatcher implements MessageHandler{
         for (; i<Parameters.FLAT_TABLE; i++){
             keks[i] = (SealedObject) body[i];
         }
-        for (int j=0; i<Parameters.FLAT_TABLE; j++){
+        for (int j=0; j<Parameters.FLAT_TABLE; j++){
             deks[j] = (SealedObject) body[i+j];
         }
         km.updateOnLeave(keks, deks);
@@ -165,6 +166,7 @@ public class ServerDispatcher implements MessageHandler{
      * All members have update their keys.
      */
     private void updateComplete() {
+        logger.log("OPERATION COMPLETE!");
         km.confirmUpdate();
         ui.updateComplete();
     }
