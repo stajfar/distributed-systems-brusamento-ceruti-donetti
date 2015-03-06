@@ -11,7 +11,6 @@ import it.polimi.brusamentocerutidonetti.securegroup.client.security.KeysManager
 import it.polimi.brusamentocerutidonetti.securegroup.common.Message;
 import it.polimi.brusamentocerutidonetti.securegroup.common.Parameters;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.Socket;
 import java.security.Key;
 import javax.crypto.SealedObject;

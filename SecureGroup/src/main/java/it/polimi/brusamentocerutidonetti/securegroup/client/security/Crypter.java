@@ -28,7 +28,7 @@ import javax.crypto.SealedObject;
  */
 public class Crypter implements MessageSender, MessageHandler{
     
-    public static final String groupIP = "225.0.0.1";
+    public static final String groupIP = "224.0.0.3";
     public static final int portMulticast = 6789;
     
     private DEKManager dekm;
