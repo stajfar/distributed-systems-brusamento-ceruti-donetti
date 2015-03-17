@@ -44,6 +44,7 @@ public class Crypter implements MessageSender, MessageHandler{
             InetAddress group = InetAddress.getByName(groupIP);
             MulticastSocket s = new MulticastSocket(portMulticast);
             s.joinGroup(group);
+            s.setInterface(InetAddress.getByName("localhost"));
             this.ms = new GroupSender(s, group);
             new Thread(new GroupReceiver(s, this)).start();
         } catch (UnknownHostException ex) {
