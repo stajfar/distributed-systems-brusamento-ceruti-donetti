@@ -43,7 +43,7 @@ public class GroupReceiver implements Runnable{
                 } catch (ClassNotFoundException | IOException ex){
                     Logger.getLogger(GroupReceiver.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+                os.close();
                 mh.handleMessage(msg);
             } catch (IOException ex) {
                 Logger.getLogger(GroupReceiver.class.getName()).log(Level.SEVERE, null, ex);
