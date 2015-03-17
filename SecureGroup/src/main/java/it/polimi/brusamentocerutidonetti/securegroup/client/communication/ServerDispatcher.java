@@ -21,7 +21,7 @@ import javax.crypto.SealedObject;
  */
 public class ServerDispatcher implements MessageHandler{
     
-    public static final String serverIP = "10.169.165.119"; //169.254.154.44
+    public static final String serverIP = "localhost"; //169.254.154.44
     public static final int port = Parameters.serverPort;
     
     private KeysManager km;
