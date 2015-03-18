@@ -43,6 +43,9 @@ public class Crypter implements MessageSender, MessageHandler{
             this.dekm = dek;
             InetAddress group = InetAddress.getByName(groupIP);
             MulticastSocket s = new MulticastSocket(portMulticast);
+            
+            s.setInterface(InetAddress.getByName("10.0.0.1"));    
+            
             s.joinGroup(group);
             this.ms = new GroupSender(s, group);
             new Thread(new GroupReceiver(s, this)).start();
